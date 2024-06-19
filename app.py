@@ -18,17 +18,23 @@ def crear_nuevo_archivo(base_file_path, email, key, zone_id, record_name, sitena
     nuevo_nombre_archivo = f"api_dns_{record_name}.{sitename}.sh"
     shutil.copy(base_file_path, nuevo_nombre_archivo)
 
+    # Leer solo las primeras 15 líneas del archivo
     with open(nuevo_nombre_archivo, 'r') as file:
-        file_data = file.read()
+        lines = file.readlines()
 
-    file_data = file_data.replace("{email}", email)
-    file_data = file_data.replace("{key}", key)
-    file_data = file_data.replace("{zone_id}", zone_id)
-    file_data = file_data.replace("{record_name}", record_name)
-    file_data = file_data.replace("{sitename}", sitename)
+    # Modificar las líneas que contienen las variables
+    new_lines = []
+    for line in lines[:15]:
+        modified_line = line.replace("{email}", email).replace("{key}", key).replace("{zone_id}", zone_id)
+        modified_line = modified_line.replace("{record_name}", record_name).replace("{sitename}", sitename)
+        new_lines.append(modified_line)
+    
+    # Unir las líneas modificadas con el resto del archivo
+    new_content = ''.join(new_lines) + ''.join(lines[15:])
 
+    # Escribir el contenido modificado de nuevo en el archivo
     with open(nuevo_nombre_archivo, 'w') as file:
-        file.write(file_data)
+        file.write(new_content)
 
     messagebox.showinfo("Archivo Creado", f"Archivo creado: {nuevo_nombre_archivo}")
     root.quit()  # Cierra la aplicación
